@@ -5,7 +5,13 @@ const Slimbot = require('slimbot')
 const bot = new Slimbot(process.env.BOT_TOKEN);
 const WhiteList = process.env.WHITE_LIST.split(",")
 const SteamKey = process.env.STEAM_KEY
+const fs = require('fs');
 
+let emoji = {}
+if (fs.existsSync("./emoji.json")) {
+    let rawdata = fs.readFileSync('./emoji.json'); //{"id":"some_text"}
+    emoji = JSON.parse(rawdata);
+}
 let optionalParams = {
     parse_mode: 'Markdown',
     disable_web_page_preview: true
@@ -18,9 +24,9 @@ let sendStatus = () => {
     let msg = ""
     for (const [user, data] of Object.entries(Statuses)) {
         if(Object.keys(data)){
-            msg += `\[${data.realName || ""}\] [${data.playerName}](https://steamcommunity.com/profiles/${user}) `
+            msg += `${emoji[user] || ""} **${data.realName || ""}** [${data.playerName}](https://steamcommunity.com/profiles/${user}) `
             if(data.gameID) {
-                msg += `играет в [${data.gameName}](https://steamcommunity.com/app/${data.gameID})`
+                msg += `играет в **[${data.gameName}](https://steamcommunity.com/app/${data.gameID})**`
             } else {
                 msg += `не играет`
             }
@@ -40,7 +46,7 @@ let steamAlert = (d) => {
 
     Statuses[steamID]["gameID"] = gameId
     Statuses[steamID]["gameName"] = gameName
-    let msg = `${realName}-${playerName} играет в ${gameName}`
+    let msg = `${emoji[steamID] || ""} **${realName || ""} - [${playerName}](https://steamcommunity.com/profiles/${steamID}) играет в [${gameName}](https://steamcommunity.com/app/${gameId})`
     console.log(msg)
     bot.sendMessage(groupId, msg, optionalParams)
         .then(message => {
@@ -55,7 +61,7 @@ let steamStopAlert = (d) => {
     let realName = d.response.players[0].realname
     let gameName = Statuses[steamID].gameName
 
-    let msg = `${realName}[${playerName}] перестал играть в ${gameName}`
+    let msg = `${emoji[steamID] || ""} **${realName || ""} ${realName} - [${playerName}](https://steamcommunity.com/profiles/${steamID}) перестал играть в [${gameName}](https://steamcommunity.com/app/${gameID})`
     Statuses[steamID]["gameID"] = undefined
     Statuses[steamID]["gameName"] = undefined
     console.log(msg)

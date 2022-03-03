@@ -56,12 +56,12 @@ let steamAlert = (d) => {
 
 let steamStopAlert = (d) => {
     let steamID = d.response.players[0].steamid
-    let gameID = d.response.players[0].gameid
+    let gameId = d.response.players[0].gameid
     let playerName = d.response.players[0].personaname
     let realName = d.response.players[0].realname
     let gameName = Statuses[steamID].gameName
 
-    let msg = `${emoji[steamID] || ""} **${realName || ""} ${realName} - [${playerName}](https://steamcommunity.com/profiles/${steamID}) перестал играть в [${gameName}](https://steamcommunity.com/app/${gameID})`
+    let msg = `${emoji[steamID] || ""} **${realName || ""} - [${playerName}](https://steamcommunity.com/profiles/${steamID}) перестал играть в [${gameName}](https://steamcommunity.com/app/${gameId})`
     Statuses[steamID]["gameID"] = undefined
     Statuses[steamID]["gameName"] = undefined
     console.log(msg)
